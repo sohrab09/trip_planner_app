@@ -11,21 +11,19 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   const { user } = React.useContext(AuthContext);
 
+  React.useEffect(() => {}, [user]);
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen
-            name="Main"
-            component={TabNavigation}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="Main" component={TabNavigation} />
         ) : (
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="Login" component={LoginScreen} />
         )}
       </Stack.Navigator>
     </NavigationContainer>
