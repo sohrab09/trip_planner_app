@@ -1,98 +1,160 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🚗 Trip Planner App
 
-# Getting Started
+A simple and modular **Trip Planning App** built with **React Native CLI**, supporting trip creation, viewing, and simulated authentication. It uses **AsyncStorage** for local persistence and **Context API** for state management.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 📱 Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- ✅ Login with inline validation (no backend)
+- ✅ Home screen to create new trips
+- ✅ Trip listing with pull-to-refresh & delete on long press
+- ✅ Settings screen to view user info and logout
+- ✅ React Navigation v6 (Stack + Bottom Tab)
+- ✅ Context API for state management
+- ✅ AsyncStorage for local storage
+- ✅ Inline form validations
+- ✅ Font setup as per Figma design (e.g., Inter)
+- ✅ Modular folder structure
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 📂 Folder Structure
 
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+/trip-planner-app
+├── /assets
+├── /components
+├── /context
+├── /screens
+├── /navigation
+├── /utils
+├── App.tsx
+└── ...
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+````
 
-### Android
+---
 
-```sh
-# Using npm
-npm run android
+## 🧾 Step-by-step Guide
 
-# OR using Yarn
-yarn android
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/sohrab09/trip_planner_app
+cd trip-planner-app
+````
+
+### 2. Install Dependencies
+
+```bash
+npm install
 ```
 
-### iOS
+### 3. Run Metro Bundler (in a new terminal)
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npx react-native start
 ```
 
-Then, and every time you update your native dependencies, run:
+### 4. Run the App on Android Emulator or Device
 
-```sh
-bundle exec pod install
+```bash
+npx react-native run-android
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### 5. Run the App on iOS (Mac Only)
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```bash
+npx react-native run-ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+> 💡 **Make sure an emulator is running or a physical device is connected.**
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+---
 
-## Step 3: Modify your app
+## 🎨 Fonts Used
 
-Now that you have successfully run the app, let's make changes!
+* **Inter** font is used throughout the app.
+* To configure custom fonts:
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+  1. Add `.ttf` files in `assets/fonts`
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+  2. Add this to `react-native.config.js`:
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+     ```js
+     module.exports = {
+       assets: ['./assets/fonts'],
+     };
+     ```
 
-## Congratulations! :tada:
+  3. Run:
 
-You've successfully run and modified your React Native App. :partying_face:
+     ```bash
+     npx react-native link
+     ```
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 💡 Technologies Used
 
-# Troubleshooting
+* React Native CLI
+* TypeScript
+* React Navigation v6
+* AsyncStorage
+* Context API
+* Custom Components
+* Modular Architecture
+* Styled with `StyleSheet`
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+---
 
-# Learn More
+## ⚙️ VS Code Tips
 
-To learn more about React Native, take a look at the following resources:
+* Use **React Native Tools** extension
+* Debug easily with **Breakpoints** or `console.log`
+* Use **"Terminal > New Terminal"** to run Metro bundler and emulator commands
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
-# trip_planner_app
+---
+
+## 🔐 Simulated Login
+
+* The login form accepts any valid name, email, and password.
+* No backend, no token – context is used to simulate authentication.
+* User info is stored in memory using `AuthContext`.
+
+💡 Default User
+This app simulates login (no actual authentication). You can use any:
+
+Name: any name
+
+Email: anything@email.com
+
+Password: any password
+
+---
+
+## 🧪 Bonus Features
+
+* ✅ Trip deletion via long press and modal confirmation
+* ✅ Pull-to-refresh on trips list
+* ✅ Error handling with user-friendly messages
+* ✅ Validations for each input field
+* ✅ Responsive layout
+
+---
+
+---
+
+## 📄 License
+
+This project is for demo purposes.
+
+---
+
+## 📷 Screenshots
+
+
+
+---
