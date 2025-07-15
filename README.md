@@ -155,6 +155,15 @@ This project is for demo purposes.
 
 ## 📷 Screenshots
 
+![Login](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/login.jpg)
+![Login Validation](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/login%20validation.jpg)
+![Home](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/home.jpg)
+![Load Unload Modal](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/load%20unload.jpg)
+![Home Validation](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/home%20validation.jpg)
+![Trips](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/trips.jpg)
+![Trips Delete](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/delete%20trips.jpg)
+![Settings](https://github.com/sohrab09/trip_planner_app/blob/0ed0620e7fc65c601c5cf1bef829a512731adbd5/settings.jpg)
+
 
 
 ---
