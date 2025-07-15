@@ -20,6 +20,7 @@ interface Trip {
 
 const TripsScreen: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getAllTrips = async (): Promise<any[]> => {
     try {
@@ -32,8 +33,10 @@ const TripsScreen: React.FC = () => {
   };
 
   const fetchTrips = React.useCallback(async () => {
+    setRefreshing(true);
     const storedTrips = await getAllTrips();
     setTrips(storedTrips);
+    setRefreshing(false);
   }, []);
 
   useEffect(() => {
@@ -67,6 +70,8 @@ const TripsScreen: React.FC = () => {
         ListEmptyComponent={
           <Text style={styles.noTripHeading}>No Trips Found</Text>
         }
+        refreshing={refreshing}
+        onRefresh={fetchTrips}
       />
     </SafeAreaView>
   );
