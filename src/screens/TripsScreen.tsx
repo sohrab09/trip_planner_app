@@ -6,9 +6,11 @@ import {
   StyleSheet,
   Image,
   SafeAreaView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { formatDate, formatTime } from '../utils/format';
+import Modals from '../components/Modals';
 
 interface Trip {
   id: string;
@@ -20,6 +22,8 @@ interface Trip {
 
 const TripsScreen: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const getAllTrips = async (): Promise<any[]> => {
@@ -43,18 +47,43 @@ const TripsScreen: React.FC = () => {
     fetchTrips();
   }, [fetchTrips]);
 
+  const openDeleteModal = (trip: Trip) => {
+    setSelectedTrip(trip);
+    setModalVisible(true);
+  };
+
+  const deleteTrip = async () => {
+    if (!selectedTrip) return;
+
+    try {
+      const updatedTrips = trips.filter(trip => trip.id !== selectedTrip.id);
+      setTrips(updatedTrips);
+      await AsyncStorage.setItem('tripData', JSON.stringify(updatedTrips));
+    } catch (error) {
+      console.error('Failed to delete trip:', error);
+    } finally {
+      setModalVisible(false);
+      setSelectedTrip(null);
+    }
+  };
+
   const renderItem = ({ item }: { item: Trip }) => (
-    <View style={styles.tripItem}>
-      <View>
-        <Text style={styles.routeText}>
-          {item.loadLocation} → {item.unloadLocation}
-        </Text>
-        <Text style={styles.dateText}>
-          {formatDate(item.date)} · {formatTime(item.date)}
-        </Text>
+    <TouchableWithoutFeedback onLongPress={() => openDeleteModal(item)}>
+      <View style={styles.tripItem}>
+        <View>
+          <Text style={styles.routeText}>
+            {item.loadLocation} → {item.unloadLocation}
+          </Text>
+          <Text style={styles.dateText}>
+            {formatDate(item.date)} · {formatTime(item.date)}
+          </Text>
+        </View>
+        <Image
+          source={require('../assets/icon.png')}
+          style={styles.tripImage}
+        />
       </View>
-      <Image source={require('../assets/icon.png')} style={styles.tripImage} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 
   return (
@@ -72,6 +101,11 @@ const TripsScreen: React.FC = () => {
         }
         refreshing={refreshing}
         onRefresh={fetchTrips}
+      />
+      <Modals
+        deleteTrip={deleteTrip}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
       />
     </SafeAreaView>
   );
