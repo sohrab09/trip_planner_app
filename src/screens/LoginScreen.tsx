@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,35 +13,58 @@ import InputField from '../components/InputField';
 
 const LoginScreen = () => {
   const { login } = useContext(AuthContext);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const isValidEmail = (emailToValidate: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailToValidate);
+  };
+
   const handleLogin = async () => {
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+    let valid = true;
+
+    if (!name.trim()) {
+      setNameError('Name is required');
+      valid = false;
+    } else {
+      setNameError('');
     }
 
-    if (!isValidEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
-      return;
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      valid = false;
+    } else if (!isValidEmail(email)) {
+      setEmailError('Invalid email address');
+      valid = false;
+    } else {
+      setEmailError('');
     }
+
+    if (!password.trim()) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    if (!valid) return;
 
     setLoading(true);
     try {
       await login(name, email, password);
     } catch (error) {
-      Alert.alert('Error', 'Invalid credentials');
+      setPasswordError('Invalid credentials');
     } finally {
       setLoading(false);
     }
-  };
-
-  const isValidEmail = (emailToValidate: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(emailToValidate);
   };
 
   return (
@@ -58,23 +80,41 @@ const LoginScreen = () => {
             <InputField
               placeholder="Name"
               value={name}
-              onChangeText={setName}
+              onChangeText={text => {
+                setName(text);
+                if (text.trim()) setNameError('');
+              }}
               autoCapitalize="words"
             />
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
 
             <InputField
               placeholder="Email"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={text => {
+                setEmail(text);
+                if (emailError && isValidEmail(text)) setEmailError('');
+              }}
               keyboardType="email-address"
             />
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
 
             <InputField
               placeholder="Password"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={text => {
+                setPassword(text);
+                if (text.trim()) setPasswordError('');
+              }}
               secureTextEntry
             />
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
 
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
@@ -116,15 +156,6 @@ const styles = StyleSheet.create({
   form: {
     gap: 20,
   },
-  input: {
-    backgroundColor: '#f5f0f0',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    fontSize: 16,
-    color: '#333333',
-    borderWidth: 0,
-  },
   button: {
     backgroundColor: '#B91C1C',
     borderRadius: 8,
@@ -140,6 +171,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  errorText: {
+    color: '#d11a2a',
+    marginTop: -15,
+    marginBottom: 10,
+    fontSize: 14,
+    marginLeft: 4,
   },
 });
 

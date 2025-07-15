@@ -7,9 +7,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   Modal,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,9 +32,15 @@ const HomeScreen = () => {
   );
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
+  // Error states
+  const [loadError, setLoadError] = useState('');
+  const [unloadError, setUnloadError] = useState('');
+  const [dateError, setDateError] = useState('');
+
   const onChange = (event: any, selectedDate?: Date) => {
     if (event.type === 'set' && selectedDate) {
       setDate(selectedDate);
+      setDateError('');
     }
     setShowPicker(false);
   };
@@ -43,43 +49,62 @@ const HomeScreen = () => {
     setLoadLocation('');
     setUnloadLocation('');
     setDate(null);
+    setLoadError('');
+    setUnloadError('');
+    setDateError('');
   };
 
   const handleCreateTrip = async () => {
-    if (!loadLocation || !unloadLocation || !date) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+    let valid = true;
+
+    if (!loadLocation) {
+      setLoadError('Please select a load location');
+      valid = false;
+    } else {
+      setLoadError('');
     }
+
+    if (!unloadLocation) {
+      setUnloadError('Please select an unload location');
+      valid = false;
+    } else {
+      setUnloadError('');
+    }
+
+    if (!date) {
+      setDateError('Please select a date');
+      valid = false;
+    } else {
+      setDateError('');
+    }
+
+    if (!valid) return;
 
     try {
       const newTrip = {
         id: Date.now().toString(),
         loadLocation,
         unloadLocation,
-        date: date.toISOString(),
+        date: date?.toISOString(),
       };
 
       const existingTripsRaw = await AsyncStorage.getItem('tripData');
       let tripArray: any[] = [];
 
       if (existingTripsRaw) {
-        try {
-          const parsed = JSON.parse(existingTripsRaw);
-          if (Array.isArray(parsed)) {
-            tripArray = parsed;
-          }
-        } catch (err) {
-          console.warn('Existing trip data is corrupted:', err);
+        const parsed = JSON.parse(existingTripsRaw);
+        if (Array.isArray(parsed)) {
+          tripArray = parsed;
         }
       }
 
       tripArray.push(newTrip);
       await AsyncStorage.setItem('tripData', JSON.stringify(tripArray));
-      Alert.alert('Success', 'Trip created successfully');
       clearData();
+      Alert.alert('Trip created successfully!');
     } catch (error) {
       console.error('Create Trip Error:', error);
-      Alert.alert('Error', 'Failed to create trip');
+      Alert.alert('Failed to create trip');
     }
   };
 
@@ -89,8 +114,13 @@ const HomeScreen = () => {
   };
 
   const handleSelectLocation = (location: string) => {
-    if (locationType === 'load') setLoadLocation(location);
-    else if (locationType === 'unload') setUnloadLocation(location);
+    if (locationType === 'load') {
+      setLoadLocation(location);
+      setLoadError('');
+    } else if (locationType === 'unload') {
+      setUnloadLocation(location);
+      setUnloadError('');
+    }
     setLocationModalVisible(false);
   };
 
@@ -113,6 +143,7 @@ const HomeScreen = () => {
               {loadLocation || 'Load Location'}
             </Text>
           </TouchableOpacity>
+          {loadError ? <Text style={styles.errorText}>{loadError}</Text> : null}
 
           {/* Unload Location */}
           <TouchableOpacity
@@ -123,6 +154,9 @@ const HomeScreen = () => {
               {unloadLocation || 'Unload Location'}
             </Text>
           </TouchableOpacity>
+          {unloadError ? (
+            <Text style={styles.errorText}>{unloadError}</Text>
+          ) : null}
 
           {/* Date Picker */}
           <TouchableOpacity
@@ -133,6 +167,7 @@ const HomeScreen = () => {
               {date ? date.toDateString() : 'Select Date & Time'}
             </Text>
           </TouchableOpacity>
+          {dateError ? <Text style={styles.errorText}>{dateError}</Text> : null}
 
           {showPicker && (
             <DateTimePicker
@@ -161,7 +196,7 @@ const HomeScreen = () => {
           onPress={() => setLocationModalVisible(false)}
         >
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback>
               <View style={styles.bottomModal}>
                 <View style={styles.modalHandle} />
                 <Text style={styles.modalTitle}>
@@ -238,6 +273,13 @@ const styles = StyleSheet.create({
   dateButtonText: {
     fontSize: 16,
     color: '#333333',
+  },
+  errorText: {
+    color: '#d11a2a',
+    marginTop: -5,
+    marginBottom: 10,
+    fontSize: 14,
+    marginLeft: 4,
   },
   button: {
     backgroundColor: '#a70f0f',
