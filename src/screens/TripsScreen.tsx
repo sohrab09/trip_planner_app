@@ -8,6 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatDate, formatTime } from '../utils/format';
 
 interface Trip {
   id: string;
@@ -46,7 +47,7 @@ const TripsScreen: React.FC = () => {
           {item.loadLocation} → {item.unloadLocation}
         </Text>
         <Text style={styles.dateText}>
-          {item.date} · {item.date}
+          {formatDate(item.date)} · {formatTime(item.date)}
         </Text>
       </View>
       <Image source={require('../assets/icon.png')} style={styles.tripImage} />
