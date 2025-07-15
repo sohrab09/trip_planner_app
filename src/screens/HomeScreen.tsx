@@ -8,8 +8,9 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import LocationPicker from '../components/LocationPicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,12 +27,16 @@ const HomeScreen = () => {
   const [unloadLocation, setUnloadLocation] = useState('');
   const [date, setDate] = useState<Date | null>(null);
   const [showPicker, setShowPicker] = useState(false);
+  const [locationType, setLocationType] = useState<'load' | 'unload' | null>(
+    null,
+  );
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
-  const onChange = (_event: any, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (selectedDate) {
+  const onChange = (event: any, selectedDate?: Date) => {
+    if (event.type === 'set' && selectedDate) {
       setDate(selectedDate);
     }
+    setShowPicker(false);
   };
 
   const clearData = () => {
@@ -69,7 +74,6 @@ const HomeScreen = () => {
       }
 
       tripArray.push(newTrip);
-
       await AsyncStorage.setItem('tripData', JSON.stringify(tripArray));
       Alert.alert('Success', 'Trip created successfully');
       clearData();
@@ -77,6 +81,17 @@ const HomeScreen = () => {
       console.error('Create Trip Error:', error);
       Alert.alert('Error', 'Failed to create trip');
     }
+  };
+
+  const openLocationModal = (type: 'load' | 'unload') => {
+    setLocationType(type);
+    setLocationModalVisible(true);
+  };
+
+  const handleSelectLocation = (location: string) => {
+    if (locationType === 'load') setLoadLocation(location);
+    else if (locationType === 'unload') setUnloadLocation(location);
+    setLocationModalVisible(false);
   };
 
   return (
@@ -89,25 +104,33 @@ const HomeScreen = () => {
           <Text style={styles.header}>Trip Planner</Text>
           <Text style={styles.title}>Design Your Trip</Text>
 
-          <LocationPicker
-            label="Load Location"
-            selectedValue={loadLocation}
-            onValueChange={setLoadLocation}
-            items={locations}
-          />
-          <LocationPicker
-            label="Unload Location"
-            selectedValue={unloadLocation}
-            onValueChange={setUnloadLocation}
-            items={locations}
-          />
+          {/* Load Location */}
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => openLocationModal('load')}
+          >
+            <Text style={styles.locationButtonText}>
+              {loadLocation || 'Load Location'}
+            </Text>
+          </TouchableOpacity>
 
+          {/* Unload Location */}
+          <TouchableOpacity
+            style={styles.locationButton}
+            onPress={() => openLocationModal('unload')}
+          >
+            <Text style={styles.locationButtonText}>
+              {unloadLocation || 'Unload Location'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Date Picker */}
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowPicker(true)}
           >
             <Text style={styles.dateButtonText}>
-              {date ? date.toDateString() : 'Date & Time'}
+              {date ? date.toDateString() : 'Select Date & Time'}
             </Text>
           </TouchableOpacity>
 
@@ -120,11 +143,46 @@ const HomeScreen = () => {
             />
           )}
 
+          {/* Create Button */}
           <TouchableOpacity style={styles.button} onPress={handleCreateTrip}>
             <Text style={styles.buttonText}>Create Trip</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Location Modal */}
+      <Modal
+        visible={locationModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLocationModalVisible(false)}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => setLocationModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.bottomModal}>
+                <View style={styles.modalHandle} />
+                <Text style={styles.modalTitle}>
+                  Select {locationType === 'load' ? 'Load' : 'Unload'} Location
+                </Text>
+
+                {locations.map(loc => (
+                  <TouchableOpacity
+                    key={loc.id}
+                    style={styles.locationOption}
+                    onPress={() => handleSelectLocation(loc.name)}
+                  >
+                    <Text style={styles.locationText}>{loc.name}</Text>
+                    <Text style={styles.arrow}>→</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -157,6 +215,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#000000',
   },
+  locationButton: {
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    backgroundColor: '#f5eded',
+    marginBottom: 10,
+  },
+  locationButtonText: {
+    fontSize: 16,
+    color: '#333333',
+  },
   dateButton: {
     borderWidth: 1,
     borderColor: '#fff',
@@ -180,5 +250,44 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  bottomModal: {
+    backgroundColor: '#fff',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    maxHeight: '50%',
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#ccc',
+    alignSelf: 'center',
+    borderRadius: 2,
+    marginBottom: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  locationOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  arrow: {
+    fontSize: 18,
+    color: '#999',
   },
 });
