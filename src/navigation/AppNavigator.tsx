@@ -11,12 +11,6 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   const { user } = React.useContext(AuthContext);
 
-  React.useEffect(() => {}, [user]);
-
-  if (!user) {
-    return null;
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
